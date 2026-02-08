@@ -2,17 +2,17 @@
 
 The dataset contains data information about car seat sales in 400 stores. The columns of the dataset are the following:
 
-    - **Sales**: Unit sales at each location (typically measured in thousands of units).
-    - **CompPrice**: Price charged by a competitor for a similar product (in dollars).
-    - **Income**: Average community income for the store’s area (commonly in thousands of dollars).
-    - **Advertising**: Local advertising budget for the company’s product (commonly in thousands of dollars).
-    - **Population**: Population size in the store’s area (commonly in thousands of people).
-    - **Price**: Price the company charges for the car seat at that location (in dollars).
-    - **ShelveLoc**: Quality of the shelf location in the store (Bad / Medium / Good).
-    - **Age**: Average age of people in the store’s area (in years).
-    - **Education**: Education level in the store’s area (typically years of education).
-    - **Urban**: Whether the store is in an urban location (Yes / No).
-    - **US**: Whether the store is in the United States (Yes / No).
+- **Sales**: Unit sales at each location (typically measured in thousands of units).
+- **CompPrice**: Price charged by a competitor for a similar product (in dollars).
+- **Income**: Average community income for the store’s area (commonly in thousands of dollars).
+- **Advertising**: Local advertising budget for the company’s product (commonly in thousands of dollars).
+- **Population**: Population size in the store’s area (commonly in thousands of people).
+- **Price**: Price the company charges for the car seat at that location (in dollars).
+- **ShelveLoc**: Quality of the shelf location in the store (Bad / Medium / Good).
+- **Age**: Average age of people in the store’s area (in years).
+- **Education**: Education level in the store’s area (typically years of education).
+- **Urban**: Whether the store is in an urban location (Yes / No).
+- **US**: Whether the store is in the United States (Yes / No).
 
 The target variable is the `Sales` variable, while the others are predictor variables. 
 
@@ -47,6 +47,12 @@ If we only use around the square root of all the predictors, that is, 4 variable
 predictors chosen are not the most significant (check paragraph below) and so individual splits are weak when few predictors dominate.
 
 We also check which are the most significant predictors for the model and the top three are: Price, ShelveLoc_Good and Age.
+
+### Boosting
+
+We fit the boosting ensemble model to the data and compute the test MSE. The model is fit with 500 trees and a learning rate of 0.05.
+
+We first define the trees to have `max_depth` equal to 5 and with pruning parameter equal to 0 like it was done for bagging, obtaining a test MSE of 2.72, so that the performance is superior to both bagging and random forest. 
 
 ## Conclusion
 

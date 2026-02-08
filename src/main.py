@@ -1,15 +1,16 @@
 import numpy as np
 import pandas as pd
 from sklearn.tree import export_text
+from sklearn.metrics import mean_squared_error
 import data 
 import features 
-from models import DecisionTreeReg, bagging, random_forest
+from models import DecisionTreeReg, bagging, random_forest, boosting
 import cv 
 
 # This is the main function
 def main():
     # Get the file location 
-    path = r'filepath'
+    path = r'path'
 
     # Transform into a df 
     Sales = data.csv_to_df(path)
@@ -22,7 +23,7 @@ def main():
     response = "Sales"
 
     # Separate the dataset 
-    X_train, X_test, y_train, y_test = data.make_splits(X = X, y = Sales[response])
+    X_train, X_test, y_train, y_test = data.make_splits(X = X, y = Sales[response], random_state=42)
 
     # Transform the predictors 
     preprocessor = features.transformer(categorical_predictors=categorical, numerical_predictors=numerical)
@@ -34,7 +35,7 @@ def main():
     clf.fit(X_train_transformed, y_train)
 
     # Compute the test MSE 
-    mse = (np.sum((clf.predict(X_test_transformed) - y_test) ** 2)) / y_test.shape[0]
+    mse = mean_squared_error(clf.predict(X_test_transformed), y_test)
     print(mse)
 
     # Cross-validate
@@ -46,7 +47,7 @@ def main():
                                      })
     grid_search.fit(X_train_transformed, y_train)
     best_ = grid_search.best_estimator_
-    print(best_)
+    print(best_)    
 
     # Fit the bagging to the training data  
     regr = bagging.bagging(n_estimators=500, 
@@ -57,7 +58,7 @@ def main():
     regr.fit(X_train_transformed, y_train)
 
     # Compute the test MSE
-    mse_bag = (np.sum((regr.predict(X_test_transformed) - y_test) ** 2)) / y_test.shape[0]
+    mse_bag = mean_squared_error(regr.predict(X_test_transformed), y_test)
     print(mse_bag)
 
     # Fit the random forest to the training data 
@@ -70,7 +71,7 @@ def main():
     regrf.fit(X_train_transformed, y_train)
     
     # Compute the test MSE 
-    mse_for = (np.sum((regrf.predict(X_test_transformed) - y_test) ** 2)) / y_test.shape[0]
+    mse_for = mean_squared_error(regrf.predict(X_test_transformed), y_test)
     print(mse_for)
 
     # Obtain the most important predictors for random forest 
@@ -78,6 +79,21 @@ def main():
     feature_names = [n.replace("num__", "").replace("cat__","") for n in feature_names]
     feature_imp = pd.DataFrame({"importance": regrf.feature_importances_}, index=feature_names)
     print(feature_imp.sort_values(by="importance", ascending=False))
+
+    # Fit the boosting to the training data
+    boost = boosting.boosting(
+        loss="squared_error",
+        n_estimators=500,
+        max_depth=5,
+        max_features=X_train_transformed.shape[1],
+        learning_rate=0.05,
+        ccp_alpha=0,
+    )
+    boost.fit(X_train_transformed, y_train)
+
+    # Compute the test MSE 
+    mse_boost = mean_squared_error(boost.predict(X_test_transformed), y_test)
+    print(mse_boost)
 
 if __name__ == "__main__":
     main()
